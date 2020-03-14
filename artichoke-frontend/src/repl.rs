@@ -178,7 +178,7 @@ pub fn run(
                     continue;
                 }
                 if parser_state.is_recoverable_error() {
-                    write!(error, "Could not parse input")?;
+                    writeln!(error, "Could not parse input")?;
                     buf.clear();
                     continue;
                 }
