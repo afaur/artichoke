@@ -7,8 +7,7 @@ use artichoke_backend::extn::core::exception::{IOError, LoadError};
 use artichoke_backend::ffi;
 use artichoke_backend::state::parser::Context;
 use artichoke_backend::string;
-use artichoke_backend::sys;
-use artichoke_backend::{ConvertMut, Eval, Intern, Parser as _};
+use artichoke_backend::{ConvertMut, Eval, Globals, Parser as _};
 use std::ffi::{OsStr, OsString};
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
@@ -90,12 +89,8 @@ fn execute_inline_eval(commands: Vec<OsString>, fixture: Option<&Path>) -> Resul
                 load_error(fixture.as_os_str(), "No such file or directory")?,
             )));
         };
-        let sym = interp.intern_symbol(&b"$fixture"[..]);
-        let mrb = interp.0.borrow().mrb;
         let value = interp.convert_mut(data);
-        unsafe {
-            sys::mrb_gv_set(mrb, sym, value.inner());
-        }
+        interp.set_global_variable(&b"$fixture"[..], &value)?;
     }
     for command in commands {
         let _ = interp.eval_os_str(command.as_os_str())?;
@@ -114,12 +109,8 @@ fn execute_program_file(programfile: &Path, fixture: Option<&Path>) -> Result<()
                 load_error(fixture.as_os_str(), "No such file or directory")?,
             )));
         };
-        let sym = interp.intern_symbol(&b"$fixture"[..]);
-        let mrb = interp.0.borrow().mrb;
         let value = interp.convert_mut(data);
-        unsafe {
-            sys::mrb_gv_set(mrb, sym, value.inner());
-        }
+        interp.set_global_variable(&b"$fixture"[..], &value)?;
     }
     let program = match std::fs::read(programfile) {
         Ok(programfile) => programfile,
