@@ -67,6 +67,11 @@ toolchain installed, you can install the crates specified in
 cargo build --workspace
 ```
 
+If you use homebrew on OSX and get a "couldn't execute `llvm-config --prefix`"
+warning then run `brew install llvm` and add
+`export LLVM_CONFIG_PATH=$(brew --prefix llvm)/bin/llvm-config` to your
+`.zshrc` or `.bashrc`.
+
 ### C Toolchain
 
 Some artichoke dependencies, like the mruby [`sys`](artichoke-backend/src/sys)
